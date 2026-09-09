@@ -9,7 +9,9 @@ on:
 
 permissions:
   contents: read
-
+defaults:
+  run:
+    working-directory: taeil-sns
 jobs:
   refresh:
     runs-on: ubuntu-latest
