@@ -1,8 +1,8 @@
 name: SNS 게시
 
 # 실행 방법
-#  · 수동 — 저장소 Actions 탭 → "SNS 게시" → Run workflow 버튼
-#  · 자동 — 아래 schedule 주석을 풀면 매주 월요일 오전 10시(한국시간)에 저절로 돕니다
+#  · 수동 — Actions 탭 → "SNS 게시" → Run workflow 버튼
+#  · 자동 — 아래 schedule 주석 두 줄을 풀면 매주 월요일 오전 10시(한국시간)에 저절로 돕니다
 on:
   workflow_dispatch:
     inputs:
@@ -11,10 +11,14 @@ on:
         type: boolean
         default: true
   # schedule:
-  #   - cron: '0 1 * * 1'   # 월요일 01:00 UTC = 한국시간 10:00
+  #   - cron: '0 1 * * 1'
 
 permissions:
-  contents: write        # 카드 이미지를 저장소에 올리기 위해 필요
+  contents: write
+
+defaults:
+  run:
+    working-directory: taeil-sns
 
 jobs:
   post:
@@ -46,6 +50,7 @@ jobs:
           TH_ACCESS_TOKEN: ${{ secrets.TH_ACCESS_TOKEN }}
           UPLOAD_MODE:     github
           GH_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
+          GH_DIR:          sns
         run: |
           if [ "${{ inputs.dry }}" = "true" ]; then
             node post.js --dry
@@ -53,10 +58,10 @@ jobs:
             node post.js
           fi
 
-      - name: 실행 기록 남기기
+      - name: 만들어진 카드 보관
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: 카드이미지
-          path: out/
+          path: taeil-sns/out/
           retention-days: 30
