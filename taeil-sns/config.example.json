@@ -1,0 +1,57 @@
+{
+  "_설명": "이 파일을 config.json 으로 복사한 뒤 값을 채우세요. config.json 은 절대 남에게 보내지 마세요.",
+
+  "instagram": {
+    "enabled": true,
+    "_userId": "인스타그램 비즈니스 계정 ID. 숫자 17자리 정도입니다.",
+    "userId": "",
+    "_accessToken": "장기 액세스 토큰. 60일마다 refresh.js 로 연장합니다.",
+    "accessToken": "",
+    "_appId": "Meta 앱 대시보드의 앱 ID",
+    "appId": "",
+    "_appSecret": "Meta 앱 대시보드의 앱 시크릿. 비밀번호와 같습니다.",
+    "appSecret": "",
+    "apiVersion": "v25.0"
+  },
+
+  "threads": {
+    "enabled": false,
+    "_userId": "스레드 사용자 ID",
+    "userId": "",
+    "accessToken": ""
+  },
+
+  "upload": {
+    "_설명": "인스타는 파일 첨부를 안 받고 인터넷 주소만 받습니다. 셋 중 하나를 고르세요.",
+    "mode": "github",
+
+    "github": {
+      "_설명": "깃허브 공개 저장소에 올리고 raw 주소를 씁니다. 무료이고 안정적입니다.",
+      "token": "",
+      "owner": "",
+      "repo": "",
+      "branch": "main",
+      "dir": "sns"
+    },
+
+    "imgbb": {
+      "_설명": "api.imgbb.com 에서 무료 키를 받으면 바로 됩니다. 가장 간단합니다.",
+      "apiKey": ""
+    },
+
+    "ftp": {
+      "_설명": "회사 홈페이지 서버에 직접 올립니다. npm install basic-ftp 가 필요합니다.",
+      "host": "",
+      "user": "",
+      "password": "",
+      "remoteDir": "/sns",
+      "publicBase": "https://www.taeilsolution.com/sns",
+      "secure": false
+    }
+  },
+
+  "paths": {
+    "cardsDir": "cards",
+    "outDir": "out"
+  }
+}

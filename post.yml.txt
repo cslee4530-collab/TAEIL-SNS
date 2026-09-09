@@ -1,0 +1,62 @@
+name: SNS 게시
+
+# 실행 방법
+#  · 수동 — 저장소 Actions 탭 → "SNS 게시" → Run workflow 버튼
+#  · 자동 — 아래 schedule 주석을 풀면 매주 월요일 오전 10시(한국시간)에 저절로 돕니다
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: '연습 모드 (게시하지 않고 업로드까지만)'
+        type: boolean
+        default: true
+  # schedule:
+  #   - cron: '0 1 * * 1'   # 월요일 01:00 UTC = 한국시간 10:00
+
+permissions:
+  contents: write        # 카드 이미지를 저장소에 올리기 위해 필요
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 가져오기
+        uses: actions/checkout@v4
+
+      - name: Node 준비
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 패키지 설치
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: 한글 폰트 설치
+        run: sudo apt-get install -y fonts-noto-cjk
+
+      - name: 게시 실행
+        env:
+          IG_USER_ID:      ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_APP_ID:       ${{ secrets.IG_APP_ID }}
+          IG_APP_SECRET:   ${{ secrets.IG_APP_SECRET }}
+          TH_USER_ID:      ${{ secrets.TH_USER_ID }}
+          TH_ACCESS_TOKEN: ${{ secrets.TH_ACCESS_TOKEN }}
+          UPLOAD_MODE:     github
+          GH_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ inputs.dry }}" = "true" ]; then
+            node post.js --dry
+          else
+            node post.js
+          fi
+
+      - name: 실행 기록 남기기
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 카드이미지
+          path: out/
+          retention-days: 30

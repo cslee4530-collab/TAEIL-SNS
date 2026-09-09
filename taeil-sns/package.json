@@ -1,0 +1,16 @@
+{
+  "name": "taeil-sns",
+  "version": "1.0.0",
+  "private": true,
+  "description": "태일솔루션 인스타그램·스레드 자동 게시",
+  "scripts": {
+    "check": "node check.js",
+    "dry": "node post.js --dry",
+    "post": "node post.js",
+    "refresh": "node refresh.js"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  },
+  "engines": { "node": ">=18" }
+}

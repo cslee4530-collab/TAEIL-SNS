@@ -1,0 +1,48 @@
+name: 토큰 연장
+
+# 토큰은 60일이면 만료됩니다. 매달 1일에 자동으로 연장합니다.
+# 연장된 토큰은 저장소 Secrets 에 자동으로 다시 저장됩니다.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'   # 매달 1일 00:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 토큰 연장
+        id: refresh
+        env:
+          IG_USER_ID:      ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_APP_ID:       ${{ secrets.IG_APP_ID }}
+          IG_APP_SECRET:   ${{ secrets.IG_APP_SECRET }}
+          TH_USER_ID:      ${{ secrets.TH_USER_ID }}
+          TH_ACCESS_TOKEN: ${{ secrets.TH_ACCESS_TOKEN }}
+        run: node refresh.js --print-env >> "$GITHUB_OUTPUT"
+
+      - name: 새 토큰을 Secrets 에 저장
+        if: steps.refresh.outputs.ig_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "REPO_ADMIN_TOKEN 이 없어 자동 저장을 건너뜁니다."
+            echo "새 인스타 토큰을 직접 Secrets 에 넣어주세요."
+            exit 0
+          fi
+          gh secret set IG_ACCESS_TOKEN --body "${{ steps.refresh.outputs.ig_token }}" --repo "$GITHUB_REPOSITORY"
+          if [ -n "${{ steps.refresh.outputs.th_token }}" ]; then
+            gh secret set TH_ACCESS_TOKEN --body "${{ steps.refresh.outputs.th_token }}" --repo "$GITHUB_REPOSITORY"
+          fi
+          echo "토큰을 Secrets 에 저장했습니다."
